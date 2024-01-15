@@ -94,21 +94,28 @@ def solution2(n, s, t, nums):
 
     step = 0
 
+    memo = []
+
     def find(node1, node2):
         nonlocal step
+        memo.append(node2)
+        if node2 in memo:
+            return -1
         if node1 == node2:
             return node1
         node1 = find(node1, nums[node2 - 1])
         step += 1
         return node1
 
-    find(s, t)
+    a = find(s, t)
+    b = find(t, s)
+    if a == -1 or b == -1:
+        return -1
+    else:
+        return min(a, b)
 
-    return min(len(nums) - len(remove) - step, step)
 
-
-print(solution2(5, 2, 4, [5, 1, 2, 3, 4]))
-
+print(solution2(5, 2, 1, [5, 3, 2, 1, 4]))
 
 """
 3、小红的前缀和之和
@@ -136,17 +143,17 @@ sum(i)即数组的前项之和。换言之，小红希望你构造一个长度�
 
 def solution3(n, target):
     # 枚举
-    if (1+n)*n < target < (1+n)*n//2:
+    if (1 + n) * n < target < (1 + n) * n // 2:
         return [-1]
     # 数组每一个都减去1， 填入0/1
-    target -= (1+n)*n//2
+    target -= (1 + n) * n // 2
     res = []
     for i in range(n):
-        if n-i > target:
+        if n - i > target:
             res.append(1)
         else:
             res.append(2)
-            target -= n-i
+            target -= n - i
     return [-1] if target > 0 else res
 
 
@@ -186,8 +193,5 @@ def solution3(n, target):
 输出：
 18
 """
-def solution4(n, m, nums, intervals):
-    # dp?
-
-
-
+# def solution4(n, m, nums, intervals):
+#     # dp?
