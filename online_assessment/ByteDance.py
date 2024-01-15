@@ -91,15 +91,14 @@ def solution2(n, s, t, nums):
             remove.add(i + 1)
     if s in remove or t in remove:
         return -1
-
     step = 0
-
     memo = []
 
     def find(node1, node2):
         nonlocal step
         memo.append(node2)
         if node2 in memo:
+            # 死循环
             return -1
         if node1 == node2:
             return node1
@@ -109,6 +108,7 @@ def solution2(n, s, t, nums):
 
     a = find(s, t)
     b = find(t, s)
+
     if a == -1 or b == -1:
         return -1
     else:
@@ -159,9 +159,10 @@ def solution3(n, target):
 
 """
 4、不相交区间
-现有一个长度为n的数组a和m个区间, 你可以选择任意个区间，选择的区间不能相交。如果选择一个区间[l, r]。那么可以获得》ai的分数。-
+现有一个长度为n的数组a和m个区间, 你可以选择任意个区间，选择的区间不能相交。如果选择一个区间[l, r]。那么可以获得ai的分数为数组区间[l,r]之和。
 请你计算出你可以获得的最大分数
-请注意，如果区间右端点在数组的范围之外，则该区间不可选取假设两个区间分别是l1,r1]和/2,r，如果它们满足<r或rr2，则认为这两个区间相交
+请注意，如果区间右端点在数组的范围之外，则该区间不可选取.假设两个区间分别是l1,r1和l2,r2，如果它们满足l1<=l2<=r1或l2<=r1<=r2，
+则认为这两个区间相交
 
 输入
 第一行两个整数n,m，表示数组的长度和区间的个数
@@ -193,5 +194,31 @@ def solution3(n, target):
 输出：
 18
 """
-# def solution4(n, m, nums, intervals):
-#     # dp?
+
+
+def solution4(n, m, nums, intervals):
+    # TODO: 没懂
+    # dp 选或不选， leetcode 689? 前i个元素中，一个最优秀的选法所得到的最大分数和
+    intervals.sort(key=lambda x: x[0])
+    g = [[] for _ in range(n + 1)]
+    # 前缀和
+    preSum = [0] * (n + 1)
+    for i in range(1, n + 1):
+        preSum[i] = preSum[i - 1] + nums[i - 1]
+
+    for i in range(m):
+        l, r = intervals[i]
+        if r <= n:
+            g[r].append(l)
+    print(g)
+
+    dp = [0]*(n+1)
+    for i in range(1, n + 1):
+        dp[i] = dp[i - 1]
+        for l in g[i]:
+            dp[i] = max(dp[i], dp[l - 1] + preSum[i] - preSum[l - 1])
+
+    return dp[-1]
+
+
+print(solution4(5, 3, [1, 2, 3, 4, 9], [[1, 4], [2, 3], [4, 5]]))
