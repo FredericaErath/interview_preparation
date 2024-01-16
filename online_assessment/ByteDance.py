@@ -82,40 +82,33 @@ def solution1(cars):
 
 
 def solution2(n, s, t, nums):
-    # TODO: is it correct to use DSU?
+    # TODO: ?
     if s == t:
         return 0
-    remove = set()
-    for i in range(n):
-        if nums[i] == i + 1:
-            remove.add(i + 1)
-    if s in remove or t in remove:
+    if nums[s - 1] == s or nums[t - 1] == t:
         return -1
-    step = 0
-    memo = []
 
-    def find(node1, node2):
-        nonlocal step
-        memo.append(node2)
-        if node2 in memo:
+    step = 0
+
+    def find(node1, node2, cnt):
+        if node1 == node2:
+            return cnt
+        if cnt > n:
             # 死循环
             return -1
-        if node1 == node2:
-            return node1
-        node1 = find(node1, nums[node2 - 1])
-        step += 1
-        return node1
+        cnt += 1
+        if nums[node2 - 1] == node1 or node2 == nums[node1 - 1]:
+            return cnt
+        else:
+            cnt = min(find(nums[node1 - 1], nums[node2 - 1], cnt), find(nums[node2 - 1], nums[node1 - 1], cnt))
+            return cnt
 
-    a = find(s, t)
-    b = find(t, s)
-
-    if a == -1 or b == -1:
-        return -1
-    else:
-        return min(a, b)
+    a = find(s, t, step)
+    print(a)
+    return a
 
 
-print(solution2(5, 2, 1, [5, 3, 2, 1, 4]))
+print(solution2(6, 1, 4, [3, 6, 4, 1, 2, 5]))
 
 """
 3、小红的前缀和之和
@@ -212,7 +205,7 @@ def solution4(n, m, nums, intervals):
             g[r].append(l)
     print(g)
 
-    dp = [0]*(n+1)
+    dp = [0] * (n + 1)
     for i in range(1, n + 1):
         dp[i] = dp[i - 1]
         for l in g[i]:
@@ -221,4 +214,98 @@ def solution4(n, m, nums, intervals):
     return dp[-1]
 
 
-print(solution4(5, 3, [1, 2, 3, 4, 9], [[1, 4], [2, 3], [4, 5]]))
+# print(solution4(5, 3, [1, 2, 3, 4, 9], [[1, 4], [2, 3], [4, 5]]))
+"""
+1、小红操作数组
+小红拿到了一个数组，她准备进行任意次以下操作：
+选择一个正整数x，使得数组的每个ai都变成x%ai。
+小红希望最终数组的每个元素都相等且大于0。她想要你告诉她能否达成目的。
+
+输入
+有多组测试用例，第一行输入一个整数t，表示用例组数。
+接下来每2*t行，表示一组用例。对于每组用例：
+第一行输入一个正整数n，代表数组的大小。
+第二行输入n个正整数ai，代表小红拿到的数组。
+1<=t,n,ai<=10**5
+保证n的总和不超过10**5。
+
+输出
+如果可以使得所有数相等且大于0，输出 "Yes"。否则输出 "No"。
+
+样例：
+输入：
+3
+2
+3 6
+3
+1 2 3
+2
+3 3
+
+输出：
+Yes
+No
+Yes
+"""
+
+
+def solution5(n, nums):
+    # x = 1
+    return 1 not in nums or n == 1
+
+
+"""
+2、小红的有根树
+小红拿到了一棵有根树，其中根是1号节点。小红准备给每个节点染成红色或者绿色或者蓝色。但是有以下两个要求：
+1. 每个节点和它的父亲颜色不同。 （如果它存在父亲）
+2. 每个节点和它的父亲的父亲颜色不同。 （如果它存在父亲的父亲）
+请你输出任意一种染色方案。
+
+输入
+第一行输入一个正整数m，代表节点的数量。
+接下来的n-1行，每行输入两个正整数u和v，代表节点u和节点v有一条边连接。
+1<=n<=10**5
+1<u,v<=n
+输出
+一个长度为n的、仅由'R','G','B' 三种字母组成的字符串。第i个字符为'R' 代表号节点被染成红色，为'G' 代表染成绿色，'B' 代麦染成蓝色。
+如果有多解，输出任意即可。
+
+样例
+输入：
+4
+1 2
+3 4
+1 3
+
+输出：
+BGRG
+
+"""
+
+
+def solution6(m, maps):
+    # dfs
+    # construct tree
+    tree = [[] for _ in range(m)]
+    tree = [[1]] + tree
+    for i in range(len(maps)):
+        tree[maps[i][0]].append(maps[i][1])
+        tree[maps[i][1]].append(maps[i][0])
+
+    res = [""]*m
+    t = "RGB"
+    tree[1].append(0)
+    print(tree)
+
+    def dfs(node, father, depth):
+        res[node-1] = t[depth % 3]
+        for k in range(len(tree[node])):
+            if tree[node][k] == father:
+                continue
+            dfs(tree[node][k], node, depth + 1)
+
+    dfs(1, 0, 0)
+    return "".join(res)
+
+
+solution6(4, [[1, 2], [3, 4], [1, 3]])
