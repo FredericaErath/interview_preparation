@@ -352,6 +352,8 @@ import heapq
 
 def solution7(n, k, string):
     # 穷举组合求分数
+
+    # TODO: 用堆求topk优化？
     class Num:
         def __init__(self, scores, num):
             self.score = scores
