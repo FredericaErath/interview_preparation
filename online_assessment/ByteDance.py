@@ -108,7 +108,7 @@ def solution2(n, s, t, nums):
     return a
 
 
-print(solution2(6, 1, 4, [3, 6, 4, 1, 2, 5]))
+# print(solution2(6, 1, 4, [3, 6, 4, 1, 2, 5]))
 
 """
 3、小红的前缀和之和
@@ -292,13 +292,13 @@ def solution6(m, maps):
         tree[maps[i][0]].append(maps[i][1])
         tree[maps[i][1]].append(maps[i][0])
 
-    res = [""]*m
+    res = [""] * m
     t = "RGB"
     tree[1].append(0)
     print(tree)
 
     def dfs(node, father, depth):
-        res[node-1] = t[depth % 3]
+        res[node - 1] = t[depth % 3]
         for k in range(len(tree[node])):
             if tree[node][k] == father:
                 continue
@@ -308,4 +308,147 @@ def solution6(m, maps):
     return "".join(res)
 
 
-solution6(4, [[1, 2], [3, 4], [1, 3]])
+# solution6(4, [[1, 2], [3, 4], [1, 3]])
+
+"""
+小红想用山楂制作糖葫芦，一串糖葫芦用一串字符串表示，糖葫芦的甜度为串上所有字符的甜度之和。字符的甜度为这个字符与字符'a'的差值。
+即'a'的甜度为0，'b'的甜度为 1 ..... 'z' 的甜度为 25。小红有n个山植按顺序从1到n依次摆放，山植被表示为一个字符，山植的甜度即为字符的甜度。
+小红制作糖葫芦时，需要取出一段连续的山楂制作成糖葫芦。
+小红想知道，在所有可能被制成的糖葫芦中，甜度第k大的糖葫芦甜度为多少？
+若有一根糖葫串本身或翻转后与另一串糖葫芦相同，则这两串糖葫芦被视为是相同的糖葫芦。
+例如，糖葫芦 "abc" 与 "cba" 被认为是相同的糖动芦。
+
+输入
+第一行输入两个整数 n, k (1<=n<=200,1<=k<=n*(n+1)/2)
+第二行输入一个长度为n的字符串，表示山楂的摆放顺序。
+
+输出
+一行一个整数，表示甜度第k大的是多少。若可能产生的糖葫芦数小于k-1，则输出 -1。
+
+样例
+输入：
+3 4
+abc
+
+输出：
+1
+
+提示：
+可能制作的糖葫芦串为a,b,c,ab,bc,abc。甜度分别为0,1,2,1,3,3，其中第4甜的糖葫芦串甜度为1。
+
+输入：
+3 4
+aba
+
+输出：
+0
+
+提示：
+可以制作的糖葫芦只有4种："a"、"b"、"ab"、"aba"甜度分别是0,1,1,2，第4甜的糖葫芦甜度为0。请注意，"ba"和"ab"被视为同一种
+"""
+
+import heapq
+
+
+def solution7(n, k, string):
+    # 穷举组合求分数
+    class Num:
+        def __init__(self, scores, num):
+            self.score = scores
+            self.num = num
+
+        def __lt__(self, other):
+            if self.score < other.score:
+                return True
+            else:
+                return False
+
+    nums = []
+    memo = set()
+    for i in range(n):
+        for j in range(i, n):
+            tmp = string[i:j + 1]
+            if tmp in memo or tmp[::-1] in memo:
+                continue
+            memo.add(tmp)
+            score = 0
+            for t in tmp:
+                score += ord(t) - ord('a')
+            nums.append(Num(score, tmp))
+    nums.sort(reverse=True)
+    if len(nums) < k-1:
+        return -1
+    return nums[k-1].score
+
+
+print(solution7(3, 4, "abc"))
+
+"""
+小红拿到了一个数组，她可以进行以下操作：选择两个相同的元素 x，将它们删除，并将2x添加进数组。这种操作称为一次 “合并”。
+小红在进行合并之前可以先往数组里添加任意一个元素。之后小红希望最大化 “合并” 的次数。请你帮帮小红。
+
+输入
+第一行输入一个正整数n，代表数组的大小。
+第二行输入n个正整数ai，代表小红拿到的数组。
+1<=n<=10**5
+1<=ai<=10**9
+
+输出
+输出两个整数，第一个数为添加的元素，第二个数为合并的最大次数。
+如果有多种添加的方案，输出任意一个即可。
+
+样例
+输入：
+3
+1 1 3
+
+输出：
+3 2
+
+提示：
+添加3后，数组变成[1,1,3,3]，可以合并两次。
+添加2也是可以的，依然可以合并2次。
+"""
+
+
+def solution8(n, nums):
+    # 优先合并已经是两个的 可以更高效吗？
+    counter = Counter(nums)
+    step = 0
+
+    def merge(counters, num, times):
+        if counters[num] <= 1:
+            return times
+        else:
+            cnt = counters[num] // 2
+            times += cnt
+            counters[num] = counters[num] % 2
+            counters[2 * num] = counters[2 * num] + cnt
+            times = merge(counters, counters[2 * num], times)
+            return times
+
+    keys = list(counter.keys())
+    for i in keys:
+        if counter[i] > 1:
+            step = merge(counter, i, step)
+
+    nums = [i for i in counter if counter[i] != 0]
+    print(nums, step)
+    nums.sort(reverse=True)
+    max_step = 0
+    res = -1
+    for i in range(len(nums)):
+        if nums[i] % 2 == 0:
+            tmp = nums[i]
+            time = 0
+            while tmp % 2 == 0 and tmp // 2 in nums:
+                time += 1
+                tmp = tmp // 2
+            if time > max_step:
+                max_step = time
+                res = tmp
+    if max_step != 0:
+        max_step += 1
+    return [res if res != -1 else nums[0], step + max_step]
+
+# print(solution8(3, [1, 2, 3, 4]))
