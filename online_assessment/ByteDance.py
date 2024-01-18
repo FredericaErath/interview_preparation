@@ -483,7 +483,8 @@ import numpy as np
 
 
 def solution9(n, k, nums):
-    # 前缀积, 子数组需要时连续的 TODO: preprod有可能很大？
+    # 前缀积, 子数组需要时连续的
+    """
     preProd = [1]*(n+1)
     for i in range(1, n+1):
         preProd[i] = preProd[i-1]*nums[i-1]
@@ -495,6 +496,29 @@ def solution9(n, k, nums):
             if preProd[j] / preProd[i-1] % k == 0:
                 cnt += 1
 
+    print(cnt)
+    return cnt
+    """
+    # 优化：
+    import sympy
+    # TODO: is it sufficient?
+    fact = list(sympy.factorint(k).items())
+    print(fact)
+    ls = [[0] * len(fact)]
+    for num in nums:
+        b = ls[-1].copy()
+        for i, (p, r) in enumerate(fact):
+            while num % p == 0:
+                num //= p
+                b[i] += 1
+        ls.append(b)
+    print(ls)
+
+    cnt = 0
+    for i in range(n + 1):
+        for j in range(1, i + 1):
+            if ls[i][0] - ls[j - 1][0] >= fact[0][1] and ls[i][1] - ls[j - 1][1] >= fact[1][1]:
+                cnt += 1
     print(cnt)
     return cnt
 
