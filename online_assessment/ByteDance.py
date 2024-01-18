@@ -378,9 +378,9 @@ def solution7(n, k, string):
                 score += ord(t) - ord('a')
             nums.append(Num(score, tmp))
     nums.sort(reverse=True)
-    if len(nums) < k-1:
+    if len(nums) < k - 1:
         return -1
-    return nums[k-1].score
+    return nums[k - 1].score
 
 
 print(solution7(3, 4, "abc"))
@@ -453,4 +453,50 @@ def solution8(n, nums):
         max_step += 1
     return [res if res != -1 else nums[0], step + max_step]
 
+
 # print(solution8(3, [1, 2, 3, 4]))
+
+"""
+5、小红统计子数组
+小红拿到了一个大小为n的数组，她想知道，有多少个连续子数组满足，该子数组所有元素的乘积是k的倍数？
+
+输入
+第一行输入两个正整数n和k。
+第二行输入n个正整数ai。
+1<n<10**5
+1<ai<10**6
+1<k<10**12
+
+输出
+满足条件的子数组数量。
+
+样例：
+输入：
+3 6
+2 3 4
+
+输出：
+3
+"""
+
+import numpy as np
+
+
+def solution9(n, k, nums):
+    # 前缀积, 子数组需要时连续的 TODO: preprod有可能很大？
+    preProd = [1]*(n+1)
+    for i in range(1, n+1):
+        preProd[i] = preProd[i-1]*nums[i-1]
+    print(preProd)
+
+    cnt = 0
+    for i in range(1, n+1):
+        for j in range(i, n+1):
+            if preProd[j] / preProd[i-1] % k == 0:
+                cnt += 1
+
+    print(cnt)
+    return cnt
+
+
+solution9(3, 6, [2, 3, 4])
